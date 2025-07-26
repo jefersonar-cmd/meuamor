@@ -282,67 +282,70 @@
     <script>
         $(document).ready(function () {
             const secretWord = "JOY";
-            let guessedLetters = [];
+        let guessedLetters = [];
+        let player;
 
-            // --- LÓGICA DO JOGO DA FORCA ---
-            function setupGame() {
-                // Limpa o conteúdo anterior
-                $('#word-display').empty();
-                $('#keyboard').empty();
+        // 🌟 LISTA DE MENSAGENS DRAMÁTICAS 🌟
+        const dramaticMessages = [
+            "Você não me ama mais? 😭",
+            "Essa letra errada partiu meu coração em mil pedaços... 💔",
+            "Acho que você esqueceu...",
+            "Tem certeza que é você mesma jogando? 🤔",
+            "Errado! Tente de novo, minha bebê.",
+            "Está me testando, né? Só pode ser! 😉",
+            "Foco, amor! Você consegue!",
+            "Hmm... essa letra não parece com o apelido do amor da minha vida.",
+            "Sério mesmo? 🤨",
+            "AU! Essa doeu aqui no fundo da alma."
+        ];
 
-                // Cria os espaços para as letras
-                secretWord.split('').forEach(() => {
-                    $('#word-display').append('<div class="letter-placeholder"></div>');
-                });
-
-                // Cria o teclado virtual
-                const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-                alphabet.split('').forEach(letter => {
-                    $('#keyboard').append(`<button class="key">${letter}</button>`);
-                });
-            }
-
-            // 1. Ao clicar no botão inicial
-            $('#reveal-game-btn').on('click', function () {
-                $(this).fadeOut(400);
-                setupGame(); // Configura o jogo
-                $('#game-container').delay(400).fadeIn(800);
+        window.onYouTubeIframeAPIReady = function() {
+            player = new YT.Player('player', {
+                height: '360', width: '640', videoId: 'SEU_VIDEO_ID_DO_YOUTUBE',
+                playerVars: { 'autoplay': 1, 'controls': 1, 'mute': 1, 'loop': 1, 'playlist': 'SEU_VIDEO_ID_DO_YOUTUBE' }
             });
+        }
 
-            // 2. Ao clicar em uma letra do teclado
-            $('#keyboard').on('click', '.key', function () {
-                const clickedButton = $(this);
-                const letter = clickedButton.text();
-                clickedButton.prop('disabled', true); // Desabilita o botão
+        function setupGame() {
+            $('#word-display').empty();
+            $('#keyboard').empty();
+            secretWord.split('').forEach(() => $('#word-display').append('<div class="letter-placeholder"></div>'));
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('').forEach(letter => $('#keyboard').append(`<button class="key">${letter}</button>`));
+        }
 
-                if (secretWord.includes(letter)) {
-                    // ACERTOU
-                    clickedButton.addClass('correct');
-                    guessedLetters.push(letter);
+        $('#reveal-game-btn').on('click', function() {
+            $(this).fadeOut(400);
+            setupGame();
+            $('#game-container').delay(400).fadeIn(800);
+        });
 
-                    // Atualiza os espaços em branco
-                    secretWord.split('').forEach((char, index) => {
-                        if (char === letter) {
-                            $('.letter-placeholder').eq(index).text(char);
-                        }
-                    });
+        $('#keyboard').on('click', '.key', function() {
+            const clickedButton = $(this);
+            const letter = clickedButton.text();
+            clickedButton.prop('disabled', true);
 
-                    // Verifica se ganhou
-                    if (guessedLetters.length === secretWord.length) {
-                        // JOGO VENCIDO!
-                        setTimeout(() => {
-                            $('#game-container').fadeOut(400);
-                            $('#main-content').delay(400).fadeIn(800, () => {
-                                startRomanticAnimations();
-                            });
-                        }, 1000);
-                    }
-                } else {
-                    // ERROU
-                    clickedButton.addClass('incorrect');
-                    alert('você não me ama mais?😭');
+            if (secretWord.includes(letter)) {
+                clickedButton.addClass('correct');
+                guessedLetters.push(letter);
+                secretWord.split('').forEach((char, index) => {
+                    if (char === letter) $('.letter-placeholder').eq(index).text(char);
+                });
+                
+                if (guessedLetters.length === secretWord.length) {
+                    setTimeout(() => {
+                        $('#game-container').fadeOut(400);
+                        $('#main-content').delay(400).fadeIn(800, () => startRomanticAnimations());
+                    }, 1000);
                 }
-            });
+            } else {
+                // ERROU
+                clickedButton.addClass('incorrect');
+                
+                // 🌟 SORTEIA E EXIBE A MENSAGEM ALEATÓRIA 🌟
+                const randomIndex = Math.floor(Math.random() * dramaticMessages.length);
+                alert(dramaticMessages[randomIndex]);
+            }
+        });
 
             // --- FUNÇÕES DA PÁGINA ROMÂNTICA ---
             function startRomanticAnimations() {
@@ -361,7 +364,7 @@
             }
 
             const textElement = $('#romantic-text');
-            const originalText = `Cada momento contigo se transforma em ótimas memórias.<br>Esta imagem de 15/07/2025 é o nosso primeiro registro fotográfico da nossa tragetória de um casal abençoado por Cristo.<br>Quero estar contigo na saúde ou na doença, na riqueza ou na pobreza, nos dias bons ou nos dias ruins, com todas as suas mil e umas emoções simuntâneas.<br>Eu te amo muitão minha cacheadinha❤️.<br>Você será por minha mulher e eu seu homem, lutarei por nós, te amarei de todo coração e todos os dias.<br>Eu escolhi te amar, e eu faço questão de fazer manutenção dele, sempre te lembrando o quanto a amo.<br>Antes de conhecer, você já estava em minhas orações🙇‍♂️.`
+            const originalText = `Cada momento contigo se transforma em ótimas memórias.<br>Esta imagem de 15/07/2025 é o nosso primeiro registro fotográfico da nossa tragetória de um casal abençoado por Cristo.<br>Quero estar contigo na saúde ou na doença, na riqueza ou na pobreza, nos dias bons ou nos dias ruins, com todas as suas mil e umas emoções simuntâneas.<br>Eu te amo muitão minha cacheadinha❤️.<br>Você será por minha mulher e eu seu homem, lutarei por nós, te amarei de todo coração e todos os dias.<br>Eu escolhi te amar, e eu faço questão de fazer manutenção dele, sempre te lembrando o quanto a amo.<br>Antes de conhecer, você já estava em minhas orações🙇‍♂️.<br>Deus seja sempre louvado por te ter em minha vida<br>Você é minha alegria.<br>❤️My joy❤️`
             let charIndex = 0;
             function typeWriter() {
                 let typingInterval = setInterval(function () {
