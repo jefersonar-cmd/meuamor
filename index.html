@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Um Desafio para Você...</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Lora:ital,wght@0,400..700;1,400..700&display=swap"
+        rel="stylesheet">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <style>
+        /* --- Reset Básico e Estilos Gerais --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            min-height: 100%;
+            font-family: 'Lora', serif;
+            background: linear-gradient(135deg, #1c1c1c 0%, #3c3c3c 100%);
+            backdrop-filter: blur(10px);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            padding: 20px 15px;
+        }
+
+        /* --- Estilos do Botão Inicial --- */
+        #reveal-game-btn {
+            background-color: #ff69b4;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 105, 180, 0.4);
+        }
+
+        /* --- 🌟 NOVO: Estilos do Jogo da Forca 🌟 --- */
+        #game-container {
+            width: 100%;
+            max-width: 500px;
+            /* Um pouco mais largo para o teclado */
+            text-align: center;
+        }
+
+        #game-container h2 {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+        }
+
+        #word-display {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .letter-placeholder {
+            width: 60px;
+            height: 70px;
+            border-bottom: 4px solid #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3rem;
+            font-weight: bold;
+            color: #ffc0cb;
+        }
+
+        #keyboard {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .key {
+            width: 40px;
+            height: 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .key:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .key.correct {
+            background-color: #28a745;
+            /* Verde */
+            border-color: #28a745;
+        }
+
+        .key.incorrect {
+            background-color: #dc3545;
+            /* Vermelho */
+            border-color: #dc3545;
+        }
+
+        /* --- Estilos do Conteúdo Principal (Card, etc.) --- */
+        #main-content {
+            overflow-y: hidden;
+            animation: fadeIn 1s ease-in-out;
+            background: rgba(255, 255, 255, 0.1); /* Fundo levemente transparente */
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px); /* Efeito de vidro fosco */
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            padding: 20px;
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .card-container {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px;
+            background: rgba(255, 182, 193, 0.1);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            text-align: center;
+        }
+
+        .card-container img {
+            width: 100%;
+            max-width: 350px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 3px solid white;
+        }
+
+        .text-content h1 {
+            font-family: 'Great Vibes', cursive;
+            font-size: 4rem;
+            color: #ffc0cb;
+        }
+
+        .text-content p {
+            font-size: 1.2rem;
+            line-height: 1.7;
+        }
+
+        .love-counter-container {
+            padding: 15px;
+            margin-top: 20px;
+            border-top: 1px solid rgba(255, 192, 203, 0.3);
+            width: 100%;
+        }
+
+        #time-elapsed {
+            font-weight: bold;
+            color: #ffc0cb;
+        }
+
+        .hearts-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+            overflow-y: hidden;
+        }
+
+        .heart {
+            position: absolute;
+            bottom: -50px;
+            color: rgba(255, 105, 180, 0.4);
+            animation: float 10s linear infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0);
+            }
+
+            100% {
+                transform: translateY(-120vh);
+            }
+        }
+
+        /* Responsividade */
+        @media (max-width: 480px) {
+            #game-container h2 {
+                font-size: 1.2rem;
+            }
+
+            .letter-placeholder {
+                width: 45px;
+                height: 55px;
+                font-size: 2.5rem;
+            }
+
+            .key {
+                width: 35px;
+                height: 35px;
+                font-size: 1rem;
+            }
+
+            .text-content h1 {
+                font-size: 2.5rem;
+            }
+
+            .text-content p {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <button id="reveal-game-btn">clique aqui ❤️</button>
+
+    <div id="game-container" style="display: none;">
+        <h2>Quem eu amo nessa terra depois de Deus?</h2>
+        <div id="word-display"></div>
+        <div id="keyboard"></div>
+    </div>
+
+    <div class="hearts-container"></div>
+    <div id="main-content" style="display: none;">
+        <iframe data-testid="embed-iframe" style="border-radius:12px; margin-bottom: 5px;"
+            src="https://open.spotify.com/embed/track/4ARs8nXnghAr7SkYGWPXju?utm_source=generator" width="100%"
+            height="80" frameBorder="0" allowfullscreen=""
+            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+        <div class="text-content">
+            <h1 style="text-align: center;">Eu te amo mais de mil milhões.</h1>
+        </div>
+        <main class="card-container">
+            <img src="042d099949a0c312f7f60bab865aed0f.jpg" alt="Um casal se abraçando em um momento romântico.">
+            <div class="text-content">
+                <h1>Para o meu amor...</h1>
+                <p id="romantic-text"></p>
+            </div>
+            <div class="love-counter-container">
+                <p>Eu te amo há <span id="time-elapsed">calculando nosso tempo...</span></p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            const secretWord = "JOY";
+            let guessedLetters = [];
+
+            // --- LÓGICA DO JOGO DA FORCA ---
+            function setupGame() {
+                // Limpa o conteúdo anterior
+                $('#word-display').empty();
+                $('#keyboard').empty();
+
+                // Cria os espaços para as letras
+                secretWord.split('').forEach(() => {
+                    $('#word-display').append('<div class="letter-placeholder"></div>');
+                });
+
+                // Cria o teclado virtual
+                const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                alphabet.split('').forEach(letter => {
+                    $('#keyboard').append(`<button class="key">${letter}</button>`);
+                });
+            }
+
+            // 1. Ao clicar no botão inicial
+            $('#reveal-game-btn').on('click', function () {
+                $(this).fadeOut(400);
+                setupGame(); // Configura o jogo
+                $('#game-container').delay(400).fadeIn(800);
+            });
+
+            // 2. Ao clicar em uma letra do teclado
+            $('#keyboard').on('click', '.key', function () {
+                const clickedButton = $(this);
+                const letter = clickedButton.text();
+                clickedButton.prop('disabled', true); // Desabilita o botão
+
+                if (secretWord.includes(letter)) {
+                    // ACERTOU
+                    clickedButton.addClass('correct');
+                    guessedLetters.push(letter);
+
+                    // Atualiza os espaços em branco
+                    secretWord.split('').forEach((char, index) => {
+                        if (char === letter) {
+                            $('.letter-placeholder').eq(index).text(char);
+                        }
+                    });
+
+                    // Verifica se ganhou
+                    if (guessedLetters.length === secretWord.length) {
+                        // JOGO VENCIDO!
+                        setTimeout(() => {
+                            $('#game-container').fadeOut(400);
+                            $('#main-content').delay(400).fadeIn(800, () => {
+                                startRomanticAnimations();
+                            });
+                        }, 1000);
+                    }
+                } else {
+                    // ERROU
+                    clickedButton.addClass('incorrect');
+                    alert('você não me ama mais?😭');
+                }
+            });
+
+            // --- FUNÇÕES DA PÁGINA ROMÂNTICA ---
+            function startRomanticAnimations() {
+                setInterval(createHeart, 300);
+                typeWriter();
+                updateCounter();
+                setInterval(updateCounter, 1000);
+            }
+
+            function createHeart() {
+                const heart = $('<div class="heart">❤</div>').css({
+                    'left': Math.random() * 100 + 'vw', 'animation-duration': (Math.random() * 5 + 5) + 's', 'font-size': (Math.random() * 20 + 10) + 'px'
+                });
+                $('.hearts-container').append(heart);
+                setTimeout(() => heart.remove(), 10000);
+            }
+
+            const textElement = $('#romantic-text');
+            const originalText = `Cada momento contigo se transforma em ótimas memórias.<br>Esta imagem é o nosso primeiro registro fotográfico da nossa tragetória de um casal abençoado por Cristo.<br>Quero estar contigo na saúde ou na doença, na riqueza ou na pobreza, nos dias bons ou nos dias ruins, com todas as suas mil e umas emoções simuntâneas.<br>Eu te amo muitão minha cacheadinha❤️.<br>Você será por minha mulher e eu seu homem, lutarei por nós, te amarei de todo coração e todos os dias.<br>Eu escolhi te amar, e eu faço questão de fazer manutenção dele, sempre te lembrando o quanto a amo.<br>Antes de conhecer, você já estava em minhas orações🙇‍♂️.`
+            let charIndex = 0;
+            function typeWriter() {
+                let typingInterval = setInterval(function () {
+                    if (charIndex < originalText.length) {
+                        textElement.html(originalText.substring(0, charIndex + 1));
+                        charIndex++;
+                    } else {
+                        clearInterval(typingInterval);
+                    }
+                }, 50);
+            }
+
+            const startDate = new Date(2025, 5, 21, 14, 01, 0);
+            function updateCounter() {
+                const now = new Date();
+                let diff = now - startDate;
+                let years = Math.floor(diff / 31536000000); diff -= years * 31536000000;
+                let months = Math.floor(diff / 2628000000); diff -= months * 2628000000;
+                let days = Math.floor(diff / 86400000); diff -= days * 86400000;
+                let hours = Math.floor(diff / 3600000); diff -= hours * 3600000;
+                let minutes = Math.floor(diff / 60000); diff -= minutes * 60000;
+                let seconds = Math.floor(diff / 1000);
+
+                let parts = [];
+                if (years > 0) parts.push(`${years} ${years === 1 ? 'ano' : 'anos'}`);
+                if (months > 0) parts.push(`${months} ${months === 1 ? 'mês' : 'meses'}`);
+                if (days > 0) parts.push(`${days} ${days === 1 ? 'dia' : 'dias'}`);
+                if (hours > 0) parts.push(`${hours} ${hours === 1 ? 'hora' : 'horas'}`);
+                parts.push(`${minutes} ${minutes === 1 ? 'minuto' : 'minutos'}`);
+                parts.push(`${seconds} ${seconds === 1 ? 'segundo' : 'segundos'}`);
+
+                $('#time-elapsed').text(parts.join(', ').replace(/,([^,]*)$/, ' e$1'));
+            }
+        });
+    </script>
+
+</body>
+
+</html>
